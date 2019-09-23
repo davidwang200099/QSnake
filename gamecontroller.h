@@ -13,7 +13,15 @@
 #include <QGraphicsView>
 #include <QPushButton>
 #include <QMainWindow>
-
+#include <QMediaPlayer>
+#include <QMediaPlaylist>
+#include <QDialog>
+#include <fstream>
+#include <iostream>
+#include <QTextEdit>
+#include <QDateTime>
+#include <QString>
+using namespace std;
 const int period[]={50,100,200};
 
 
@@ -103,6 +111,19 @@ public:
         stopGame();
         restartGame();
     }
+    void playBGM(){
+        if(!player){
+        player=new QMediaPlayer;
+        list.clear();
+        list.addMedia(QUrl::fromLocalFile("D:/cppfiles/QTProjects/snake2/bgm1.mp3"));
+        list.setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+        player->setPlaylist(&list);
+        player->play();
+        }else {delete player;player=NULL;}
+    }
+    void askforName(QDialog *dialog);
+    void getPlayerName();
+    void endGame(){exit(0);}
     //void initAutoForage();
     //void autoForage();
     Mode mode;
@@ -132,7 +153,10 @@ public:
     QLCDNumber* markmonitorA;
     QLCDNumber* markmonitorB;
     QLCDNumber* rewardmonitor;
-
+    QMediaPlayer *player;
+    QMediaPlaylist list;
+    QDialog *dialog;
+    QTextEdit *namerecorder;
 };
 
 #endif // GAMECONTROLLER_H

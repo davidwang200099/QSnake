@@ -29,6 +29,11 @@ void MainWindow::initFunction(){
     QPushButton *buttonC=new QPushButton("restart",this);
     buttonC->setGeometry(400,450,150,40);
     connect(buttonC,&QPushButton::clicked,this->ctrl,&Gamecontroller::newGame);
+
+    QPushButton *buttonD=new QPushButton("play BGM",this);
+    buttonD->setGeometry(0,500,150,40);
+    connect(buttonD,&QPushButton::clicked,this->ctrl,&Gamecontroller::playBGM);
+
     //ctrl->vp.push_back(buttonC);
 }
 

@@ -16,6 +16,11 @@ Gamecontroller::Gamecontroller(Mode mode,QGraphicsScene &scene,QObject *parent)
         case DOUBLE:initDouble();break;
         case AUTO:initAuto();break;
     }  
+    player=NULL;
+    //list.clear();
+
+
+
 }
 
 void Gamecontroller::initSingle(){
@@ -296,6 +301,38 @@ void Gamecontroller::restartGame(){
     scene.addItem(food);
 }
 
+void Gamecontroller::askforName(QDialog *dialog){
+    QLabel *label=new QLabel(dialog);
+    label->setText("Please tell us your name:");
+    label->setGeometry(150,100,300,40);
+
+    QTextEdit *ed=new QTextEdit(dialog);
+    namerecorder=ed;
+    ed->setGeometry(150,150,300,40);
+
+    QPushButton *button_sure=new QPushButton(dialog);
+    button_sure->setGeometry(150,200,120,40);
+    button_sure->setText(tr("确定"));
+    connect(button_sure,&QPushButton::clicked,this,&Gamecontroller::getPlayerName);
+
+    QPushButton *button_exit=new QPushButton(dialog);
+    button_exit->setGeometry(300,200,120,40);
+    button_exit->setText(tr("退出"));
+    connect(button_sure,&QPushButton::clicked,this,&Gamecontroller::endGame);
+
+    dialog->resize(600,450);
+    dialog->show();
+}
+
+void Gamecontroller::getPlayerName(){
+    ofstream file;
+    file.open("PlayerName.txt",ios_base::out);
+    //if(file) cout<<"Y";
+    string str=namerecorder->toPlainText().toStdString();
+    string time=QDateTime::currentDateTime().toString("yyyy-MM-dd,hh:mm:ss").toStdString();
+    file<<str<<"\t"<<mark[0]<<"\t"<<time<<"\n";
+    file.close();
+}
 
 void Gamecontroller::gameover(Snake *snake){
     if(mode==SINGLE||mode==AUTO) {
@@ -308,7 +345,9 @@ void Gamecontroller::gameover(Snake *snake){
           scene.removeItem(snake);
           restartGame();
       } else {
-          exit(0);
+          dialog=new QDialog;
+          askforName(dialog);
+          //exit(0);
       }
     }
     else{
