@@ -28,7 +28,7 @@ public:
     void setMoveDirection(Direction direction);
     void reshape();
     void ResetColor(){ColorOfSnake=DEFAULT_COLOR;effect=NOEFFECT;}
-
+    void autoforage();
     Gamecontroller &ctrl;
     QList<QPoint> body;
     Direction moveDirection;

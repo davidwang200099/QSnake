@@ -99,42 +99,126 @@ void Snake::advance(int phase){
         if(!body.isEmpty()) body.removeFirst();
         body << PosOfSnake;
     }
-
+    if(ctrl.mode!=AUTO)
         switch (moveDirection) {
         case MoveLeft:
             PosOfSnake.rx() -= SNAKE_SIZE;
             if(PosOfSnake.rx()<X_MIN) PosOfSnake.rx()=X_MAX;
-            if(ctrl.mode==AUTO)
+            /*if(ctrl.mode==AUTO)
               if(ctrl.food->px==PosOfSnake.x())
                 setMoveDirection(ctrl.food->px<PosOfSnake.y()?Snake::MoveUp:Snake::MoveDown);
-
+            */
             break;
         case MoveRight:
             PosOfSnake.rx() += SNAKE_SIZE;
             if(PosOfSnake.rx()>X_MAX) PosOfSnake.rx()=X_MIN;
-           if(ctrl.mode==AUTO)
+           /*if(ctrl.mode==AUTO)
               if(ctrl.food->px==PosOfSnake.x())
                 setMoveDirection(ctrl.food->px<PosOfSnake.y()?Snake::MoveUp:Snake::MoveDown);
+            */
             break;
         case MoveUp:
             PosOfSnake.ry() -= SNAKE_SIZE;
             if(PosOfSnake.ry()<Y_MIN) PosOfSnake.ry()=Y_MAX;
-            if(ctrl.mode==AUTO)
+            /*if(ctrl.mode==AUTO)
               if(ctrl.food->py==PosOfSnake.y())
                 setMoveDirection(ctrl.food->px<PosOfSnake.x()?Snake::MoveLeft:Snake::MoveRight);
+            */
             break;
         case MoveDown:
             PosOfSnake.ry() += SNAKE_SIZE;
             if(PosOfSnake.ry()>Y_MAX) PosOfSnake.ry()=Y_MIN;
-            if(ctrl.mode==AUTO)
+            /*if(ctrl.mode==AUTO){
               if(ctrl.food->py==PosOfSnake.y())
                 setMoveDirection(ctrl.food->px<PosOfSnake.x()?Snake::MoveLeft:Snake::MoveRight);
+            }*/
             break;
-    }
+        }
+    else{
+        switch (moveDirection) {
+        case MoveLeft:
+           if(body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE*2,PosOfSnake.y())))
+                if(!(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                    PosOfSnake.ry()-=SNAKE_SIZE;
+                else PosOfSnake.ry()+=SNAKE_SIZE;
+            else PosOfSnake.rx() -= SNAKE_SIZE;
+
+            if(PosOfSnake.rx()<X_MIN) PosOfSnake.rx()=X_MAX;
+
+            if(ctrl.food->px==PosOfSnake.x())
+              if(ctrl.food->py<PosOfSnake.y())
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveDown);
+                else setMoveDirection(Snake::MoveUp);
+             else
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()+SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveUp);
+                else setMoveDirection(Snake::MoveDown);
+            break;
+        case MoveRight:
+            if(body.contains(QPoint(PosOfSnake.x()+SNAKE_SIZE*2,PosOfSnake.y())))
+                if(!(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                        setMoveDirection(Snake::MoveUp);
+                else PosOfSnake.rx() -= SNAKE_SIZE;
+            else PosOfSnake.rx() += SNAKE_SIZE;
+
+            if(PosOfSnake.rx()>X_MAX) PosOfSnake.rx()=X_MIN;
+
+            if(ctrl.food->px==PosOfSnake.x())
+              if(ctrl.food->py<PosOfSnake.y())
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveDown);
+                else setMoveDirection(Snake::MoveUp);
+             else
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()+SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveUp);
+                else setMoveDirection(Snake::MoveDown);
+            break;
+        case MoveUp:
+            if(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE*2)))
+                if(!(body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                        PosOfSnake.rx()-=SNAKE_SIZE;
+                else PosOfSnake.rx()+=SNAKE_SIZE;
+            else PosOfSnake.ry() -= SNAKE_SIZE;
+
+            if(PosOfSnake.ry()<Y_MIN) PosOfSnake.ry()=Y_MAX;
+
+            if(ctrl.food->py==PosOfSnake.y())
+              if(ctrl.food->px<PosOfSnake.x())
+                if((body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveRight);
+                else setMoveDirection(Snake::MoveLeft);
+             else
+                if((body.contains(QPoint(PosOfSnake.x()+SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveLeft);
+                else setMoveDirection(Snake::MoveRight);
+            break;
+        case MoveDown:
+            if(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()+SNAKE_SIZE*2)))
+                if(!(body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                        PosOfSnake.rx()-=SNAKE_SIZE;
+                else PosOfSnake.rx()+=SNAKE_SIZE;
+            else
+                PosOfSnake.ry() += SNAKE_SIZE;
+
+            if(PosOfSnake.ry()>Y_MAX) PosOfSnake.ry()=Y_MIN;
+
+            if(ctrl.food->py==PosOfSnake.y())
+              if(ctrl.food->px<PosOfSnake.x())
+                if((body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveRight);
+                else setMoveDirection(Snake::MoveLeft);
+             else
+                if((body.contains(QPoint(PosOfSnake.x()+SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveLeft);
+                else setMoveDirection(Snake::MoveRight);
+
+            break;
+        }
     setPos(PosOfSnake);
     handleCollision();
 }
-
+}
 
 void Snake::handleCollision(){
     QList<QGraphicsItem*> l=collidingItems();
@@ -147,3 +231,28 @@ void Snake::handleCollision(){
     if(moveDirection!=NoMove&&body.contains(PosOfSnake)&&ColorOfSnake!=Qt::gray)
         ctrl.gameover(this);
 }
+
+/*void Snake::autoforage(){
+    if(ctrl.food->px==PosOfSnake.rx()){
+        if(ctrl.food->py<PosOfSnake.ry()){
+            if(body.contains(QPoint(PosOfSnake.rx(),PosOfSnake.ry()-SNAKE_SIZE)))
+                setMoveDirection(Snake::MoveDown);
+            else setMoveDirection(Snake::MoveUp);
+        } else {
+            if(body.contains(QPoint(PosOfSnake.rx(),PosOfSnake.ry()-SNAKE_SIZE)))
+                setMoveDirection(Snake::MoveUp);
+            else setMoveDirection(Snake::MoveDown);
+        }
+    } else{
+        if(ctrl.food->px<PosOfSnake.rx()){
+            if(body.contains(QPoint(PosOfSnake.rx()-SNAKE_SIZE,PosOfSnake.ry())))
+                setMoveDirection(Snake::MoveLeft);
+            else setMoveDirection(Snake::MoveRight);
+        } else {
+            if(body.contains(QPoint(PosOfSnake.rx()-SNAKE_SIZE,PosOfSnake.ry())))
+                setMoveDirection(Snake::MoveRight);
+            else setMoveDirection(Snake::MoveLeft);
+          }
+    }
+
+}*/
