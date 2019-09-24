@@ -306,7 +306,7 @@ void Gamecontroller::askforName(QDialog *dialog){
     label->setText("Please tell us your name:");
     label->setGeometry(150,100,300,40);
 
-    QTextEdit *ed=new QTextEdit(dialog);
+    QLineEdit *ed=new QLineEdit(dialog);
     namerecorder=ed;
     ed->setGeometry(150,150,300,40);
 
@@ -317,7 +317,7 @@ void Gamecontroller::askforName(QDialog *dialog){
 
     QPushButton *button_exit=new QPushButton(dialog);
     button_exit->setGeometry(300,200,120,40);
-    button_exit->setText(tr("退出"));
+    button_exit->setText(tr("取消"));
     connect(button_sure,&QPushButton::clicked,this,&Gamecontroller::endGame);
 
     dialog->resize(600,450);
@@ -325,13 +325,33 @@ void Gamecontroller::askforName(QDialog *dialog){
 }
 
 void Gamecontroller::getPlayerName(){
-    ofstream file;
-    file.open("PlayerName.txt",ios_base::out);
-    //if(file) cout<<"Y";
-    string str=namerecorder->toPlainText().toStdString();
+    ifstream fin;
+    fin.open("PlayerName.txt");
+
+    string str=namerecorder->text().toStdString();
+    int newplayermark=mark[0];
     string time=QDateTime::currentDateTime().toString("yyyy-MM-dd,hh:mm:ss").toStdString();
-    file<<str<<"\t"<<mark[0]<<"\t"<<time<<"\n";
-    file.close();
+    string newrecord="\t"+str+"\t"+time;
+
+    string line[DEFAULT_RECORDNUM];
+    int playermarks[DEFAULT_RECORDNUM];
+
+    for(int i=0;i<DEFAULT_RECORDNUM;i++){
+        fin>>playermarks[i];
+        getline(fin,line[i],'\n');
+        cout<<playermarks[i]<<"\t"<<line[i]<<endl;
+        if(newplayermark>playermarks[i]) {
+            std::swap(newplayermark,playermarks[i]);
+            std::swap(newrecord,line[i]);
+        }
+    }
+    ofstream fout;
+    fout.open("PlayerName.txt");
+    for(int i=0;i<DEFAULT_RECORDNUM;i++){
+        fout<<playermarks[i]<<line[i]<<"\n";
+    }
+    fout.close();
+    exit(0);
 }
 
 void Gamecontroller::gameover(Snake *snake){

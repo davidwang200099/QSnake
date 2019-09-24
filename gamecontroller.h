@@ -18,7 +18,10 @@
 #include <QDialog>
 #include <fstream>
 #include <iostream>
+#include <QFile>
+#include <QTextStream>
 #include <QTextEdit>
+#include <QLineEdit>
 #include <QDateTime>
 #include <QString>
 using namespace std;
@@ -156,7 +159,8 @@ public:
     QMediaPlayer *player;
     QMediaPlaylist list;
     QDialog *dialog;
-    QTextEdit *namerecorder;
+    //QTextEdit *namerecorder;
+    QLineEdit *namerecorder;
 };
 
 #endif // GAMECONTROLLER_H
