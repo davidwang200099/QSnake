@@ -6,24 +6,27 @@
 #include <QLabel>
 #include <QEvent>
 #include <QKeyEvent>
-#include "snake.h"
-#include "food.h"
-#include "wall.h"
-#include <vector>
+#include <QMessageBox>
+#include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPushButton>
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
-#include <QDialog>
-#include <fstream>
-#include <iostream>
 #include <QFile>
 #include <QTextStream>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QDateTime>
 #include <QString>
+#include <QDialog>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include "snake.h"
+#include "food.h"
+#include "wall.h"
+
 using namespace std;
 const int period[]={50,100,200};
 
@@ -40,90 +43,28 @@ public:
     void initDouble();
     void initAuto();
 
-    void HandlekeyPress(QKeyEvent *event);
+    void handlekeyPress(QKeyEvent *event);
     void SnakeAteFood(Snake *snake,Food *food);
-    void InitNewFood();
-    void InitReward();
-    void RemoveReward(){
-        if(!rewardremoved){
-          disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
-          rewardmonitor->display(0);
-          scene.removeItem(rewardfood);
-          delete rewardfood;
-          rewardremoved=true;
-        }
-    }
+    void initNewFood();
+    void initReward();
+    void removeReward();
     void gameover(Snake *snake);
 
-    void ResetSnakeAColor(){
-        snakeA->effect=Snake::NOEFFECT;
-        disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
-        rewardtime=REWARD_INTERVAL/1000;
-        rewardmonitor->display(0);
-        snakeA->ColorOfSnake=Qt::red;
-    }
-    void ResetSnakeBColor(){
-        snakeB->effect=Snake::NOEFFECT;
-        disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
-        rewardtime=REWARD_INTERVAL/1000;
-        rewardmonitor->display(0);
-        snakeB->ColorOfSnake=Qt::green;
-    }
-    void ResetSnakeASpeed(){
-        snakeA->effect=Snake::NOEFFECT;
-        disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
-        rewardmonitor->display(0);
-        disconnect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
-        connect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
-        timer->start(DEFAULT_PERIOD);
-        rewardtime=REWARD_INTERVAL/1000;
-    }
-    void ResetSnakeBSpeed(){
-        snakeB->effect=Snake::NOEFFECT;
-        disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
-        rewardmonitor->display(0);
-        disconnect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
-        connect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
-        timer[1].start(DEFAULT_PERIOD);
-        rewardtime=REWARD_INTERVAL/1000;
-
-    }
+    void resetSnakeAColor();
+    void resetSnakeBColor();
+    void resetSnakeASpeed();
+    void resetSnakeBSpeed();
     void SnakeAAdvance(){snakeA->advance(0);snakeA->advance(1);}
     void SnakeBAdvance(){snakeB->advance(0);snakeB->advance(1);}
-    void countdown(){
-        rewardmonitor->display(rewardtime);
-        if(rewardtime>0) rewardtime--;
-        else rewardtime=REWARD_INTERVAL/1000;
-    }
-    void switchimmortalMode(){
-        immortal=immortal?false:true;
-        for(int i=0;i<walls.size();i++)
-            if(walls[i]->data(GD_Type)==WALL)
-                walls[i]->setData(GD_Type,DEFAULT);
-            else walls[i]->setData(GD_Type,WALL);
-    }
+    void countdown();
+    void switchimmortalMode();
     //void autoRedirect();
     bool eventFilter(QObject *object, QEvent *event);
 
     void stopGame();
     void restartGame();
-    void newGame(){
-        disconnect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
-        if(mode==DOUBLE)
-        disconnect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
-        stopGame();
-        restartGame();
-    }
-    void playBGM(){
-        if(!player){
-        player=new QMediaPlayer;
-        list.clear();
-        list.addMedia(QUrl::fromLocalFile("D:/cppfiles/QTProjects/snake2/bgm1.mp3"));
-        list.setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
-        player->setPlaylist(&list);
-        player->play();
-        }else {delete player;player=NULL;}
-    }
+    void newGame();
+    void playBGM();
     void askforName(QDialog *dialog);
     void getPlayerName();
     void endGame(){exit(0);}

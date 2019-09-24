@@ -16,6 +16,8 @@ typedef enum{SINGLE,DOUBLE,AUTO} Mode;
 #define REWARD_INTERVAL 10000
 
 #define DEFAULT_PERIOD 100
+
+#define DEFAULT_RECORDNUM 10
 //gamecontroller.h
 //wall.h
 #define DEFAULT_WALL_WIDTH 50

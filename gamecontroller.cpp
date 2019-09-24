@@ -1,8 +1,5 @@
 #include "gamecontroller.h"
 
-#include <QMessageBox>
-#include <QGraphicsScene>
-
 Gamecontroller::Gamecontroller(Mode mode,QGraphicsScene &scene,QObject *parent)
     :scene(scene),QObject(parent),mode(mode){
     markmonitorA=new QLCDNumber;
@@ -17,10 +14,6 @@ Gamecontroller::Gamecontroller(Mode mode,QGraphicsScene &scene,QObject *parent)
         case AUTO:initAuto();break;
     }  
     player=NULL;
-    //list.clear();
-
-
-
 }
 
 void Gamecontroller::initSingle(){
@@ -49,7 +42,6 @@ void Gamecontroller::initSingle(){
         scene.addItem(wall);
         walls.push_back(wall);
     }
-
 test:
     food=new Food;
     if(snakeA->shape().contains(snakeA->mapFromScene(QPointF(food->px+5,food->py+5))))
@@ -137,9 +129,23 @@ test:
     gametimer.start(1000);
 }
 
+void Gamecontroller::countdown(){
+    rewardmonitor->display(rewardtime);
+    if(rewardtime>0) rewardtime--;
+    else rewardtime=REWARD_INTERVAL/1000;
+}
+
+void Gamecontroller::switchimmortalMode(){
+    immortal=immortal?false:true;
+    for(int i=0;i<walls.size();i++)
+        if(walls[i]->data(GD_Type)==WALL)
+            walls[i]->setData(GD_Type,DEFAULT);
+        else walls[i]->setData(GD_Type,WALL);
+}
+
 void Gamecontroller::SnakeAteFood(Snake *snake,Food *food){
   if(food->data(GD_Type)==REWARD)
-    disconnect(&rewardtimer,&QTimer::timeout,this,&Gamecontroller::RemoveReward);
+    disconnect(&rewardtimer,&QTimer::timeout,this,&Gamecontroller::removeReward);
   scene.removeItem(food);
 
   switch(food->FunctionOfFood){
@@ -154,11 +160,11 @@ void Gamecontroller::SnakeAteFood(Snake *snake,Food *food){
       snake->growing++;snake->score+=2;snake->monitor.display(snake->score);
       snake->ColorOfSnake=Qt::gray;
       if(snake==this->snakeA){
-      connect(specialtimer,&QTimer::timeout,this,&Gamecontroller::ResetSnakeAColor);
+      connect(specialtimer,&QTimer::timeout,this,&Gamecontroller::resetSnakeAColor);
       connect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
       specialtimer->start(SPECIAL_INTERVAL);
       }else {
-       connect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::ResetSnakeBColor);
+       connect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::resetSnakeBColor);
        specialtimer[1].start(SPECIAL_INTERVAL);
        connect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
        }
@@ -170,14 +176,14 @@ void Gamecontroller::SnakeAteFood(Snake *snake,Food *food){
       disconnect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
       connect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
       timer->start(DEFAULT_PERIOD/2);
-      connect(specialtimer,&QTimer::timeout,this,&Gamecontroller::ResetSnakeASpeed);
+      connect(specialtimer,&QTimer::timeout,this,&Gamecontroller::resetSnakeASpeed);
       connect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
       specialtimer->start(SPECIAL_INTERVAL);
       }else {
           disconnect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
           connect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
           timer[1].start(DEFAULT_PERIOD/2);
-          connect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::ResetSnakeBSpeed);
+          connect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::resetSnakeBSpeed);
           connect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
           specialtimer[1].start(SPECIAL_INTERVAL);
        }
@@ -189,14 +195,14 @@ void Gamecontroller::SnakeAteFood(Snake *snake,Food *food){
           disconnect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
           connect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
           timer->start(DEFAULT_PERIOD*2);
-          connect(specialtimer,&QTimer::timeout,this,&Gamecontroller::ResetSnakeASpeed);
+          connect(specialtimer,&QTimer::timeout,this,&Gamecontroller::resetSnakeASpeed);
           connect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
           specialtimer->start(SPECIAL_INTERVAL);
           }else {
               disconnect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
               connect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
               timer[1].start(DEFAULT_PERIOD*2);
-              connect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::ResetSnakeBSpeed);
+              connect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::resetSnakeBSpeed);
               connect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
               specialtimer[1].start(SPECIAL_INTERVAL);
            }
@@ -205,7 +211,7 @@ void Gamecontroller::SnakeAteFood(Snake *snake,Food *food){
   }
   if(food->data(GD_Type)==FOOD){
     delete food;
-    InitNewFood();
+    initNewFood();
     }
   else {
     delete food;
@@ -216,25 +222,25 @@ void Gamecontroller::SnakeAteFood(Snake *snake,Food *food){
 
 void Gamecontroller::stopGame(){
 
-    disconnect(&rewardtimer,&QTimer::timeout,this,&Gamecontroller::RemoveReward);
+    disconnect(&rewardtimer,&QTimer::timeout,this,&Gamecontroller::removeReward);
     disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
 
     switch(snakeA->effect){
       case Snake::SLOWDOWN:case Snake::SPEEDUP:
-disconnect(specialtimer,&QTimer::timeout,this,&Gamecontroller::ResetSnakeASpeed);
+disconnect(specialtimer,&QTimer::timeout,this,&Gamecontroller::resetSnakeASpeed);
       break;
       case Snake::THROUGHWALL:
-disconnect(specialtimer,&QTimer::timeout,this,&Gamecontroller::ResetSnakeAColor);
+disconnect(specialtimer,&QTimer::timeout,this,&Gamecontroller::resetSnakeAColor);
     }
     snakeA->effect=Snake::NOEFFECT;
 
   if(mode==DOUBLE)
     switch(snakeB->effect){
       case Snake::SLOWDOWN:case Snake::SPEEDUP:
-disconnect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::ResetSnakeBSpeed);
+disconnect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::resetSnakeBSpeed);
       break;
       case Snake::THROUGHWALL:
-disconnect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::ResetSnakeBColor);
+disconnect(specialtimer+1,&QTimer::timeout,this,&Gamecontroller::resetSnakeBColor);
     }
   snakeB->effect=Snake::NOEFFECT;
 
@@ -301,6 +307,25 @@ void Gamecontroller::restartGame(){
     scene.addItem(food);
 }
 
+void Gamecontroller::newGame(){
+    disconnect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
+    if(mode==DOUBLE)
+    disconnect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
+    stopGame();
+    restartGame();
+}
+
+void Gamecontroller::playBGM(){
+    if(!player){
+    player=new QMediaPlayer;
+    list.clear();
+    list.addMedia(QUrl::fromLocalFile("D:/cppfiles/QTProjects/snake2/bgm1.mp3"));
+    list.setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+    player->setPlaylist(&list);
+    player->play();
+    }else {delete player;player=NULL;}
+}
+
 void Gamecontroller::askforName(QDialog *dialog){
     QLabel *label=new QLabel(dialog);
     label->setText("Please tell us your name:");
@@ -318,7 +343,7 @@ void Gamecontroller::askforName(QDialog *dialog){
     QPushButton *button_exit=new QPushButton(dialog);
     button_exit->setGeometry(300,200,120,40);
     button_exit->setText(tr("取消"));
-    connect(button_sure,&QPushButton::clicked,this,&Gamecontroller::endGame);
+    connect(button_exit,&QPushButton::clicked,this,&Gamecontroller::endGame);
 
     dialog->resize(600,450);
     dialog->show();
@@ -327,7 +352,6 @@ void Gamecontroller::askforName(QDialog *dialog){
 void Gamecontroller::getPlayerName(){
     ifstream fin;
     fin.open("PlayerName.txt");
-
     string str=namerecorder->text().toStdString();
     int newplayermark=mark[0];
     string time=QDateTime::currentDateTime().toString("yyyy-MM-dd,hh:mm:ss").toStdString();
@@ -339,7 +363,7 @@ void Gamecontroller::getPlayerName(){
     for(int i=0;i<DEFAULT_RECORDNUM;i++){
         fin>>playermarks[i];
         getline(fin,line[i],'\n');
-        cout<<playermarks[i]<<"\t"<<line[i]<<endl;
+        //cout<<playermarks[i]<<"\t"<<line[i]<<endl;
         if(newplayermark>playermarks[i]) {
             std::swap(newplayermark,playermarks[i]);
             std::swap(newrecord,line[i]);
@@ -392,9 +416,7 @@ void Gamecontroller::gameover(Snake *snake){
    }
 }
 
-
-
-void Gamecontroller::HandlekeyPress(QKeyEvent *event){
+void Gamecontroller::handlekeyPress(QKeyEvent *event){
   switch (event->key()) {
       case Qt::Key_Left:
           snakeA->setMoveDirection(Snake::MoveLeft);
@@ -426,7 +448,7 @@ void Gamecontroller::HandlekeyPress(QKeyEvent *event){
 }
 
 
-void Gamecontroller::InitNewFood(){
+void Gamecontroller::initNewFood(){
     test:
     food=new Food;
     if(snakeA->shape().contains(snakeA->mapFromScene(QPointF(food->px+5,food->py+5))))
@@ -438,10 +460,10 @@ void Gamecontroller::InitNewFood(){
         {delete food;goto test;}
     scene.addItem(food);
     if(rewardremoved&&snakeA->effect==Snake::NOEFFECT&&snakeB->effect==Snake::NOEFFECT)
-        InitReward();
+        initReward();
 }
 
-void Gamecontroller::InitReward(){
+void Gamecontroller::initReward(){
     if((rand()%10)>5&&mode!=AUTO) {
         rewardremoved=false;
     test:
@@ -454,15 +476,61 @@ void Gamecontroller::InitReward(){
             if(walls[i]->boundingRect().contains(walls[i]->mapFromScene(QPointF(rewardfood->px+5,rewardfood->py+5))))
             {delete rewardfood;goto test;}
         scene.addItem(rewardfood);
-        connect(&rewardtimer,&QTimer::timeout,this,&Gamecontroller::RemoveReward);
+        connect(&rewardtimer,&QTimer::timeout,this,&Gamecontroller::removeReward);
         rewardtimer.start(REWARD_INTERVAL);
     }
 }
 
-bool Gamecontroller::eventFilter(QObject *object, QEvent *event)
-{
+void Gamecontroller::removeReward(){
+    if(!rewardremoved){
+      disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
+      rewardmonitor->display(0);
+      scene.removeItem(rewardfood);
+      delete rewardfood;
+      rewardremoved=true;
+    }
+}
+
+void Gamecontroller::resetSnakeAColor(){
+    snakeA->effect=Snake::NOEFFECT;
+    disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
+    rewardtime=REWARD_INTERVAL/1000;
+    rewardmonitor->display(0);
+    snakeA->ColorOfSnake=Qt::red;
+}
+
+void Gamecontroller::resetSnakeBColor(){
+    snakeB->effect=Snake::NOEFFECT;
+    disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
+    rewardtime=REWARD_INTERVAL/1000;
+    rewardmonitor->display(0);
+    snakeB->ColorOfSnake=Qt::green;
+}
+
+void Gamecontroller::resetSnakeASpeed(){
+    snakeA->effect=Snake::NOEFFECT;
+    disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
+    rewardmonitor->display(0);
+    disconnect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
+    connect(timer,&QTimer::timeout,this,&Gamecontroller::SnakeAAdvance);
+    timer->start(DEFAULT_PERIOD);
+    rewardtime=REWARD_INTERVAL/1000;
+}
+
+void Gamecontroller::resetSnakeBSpeed(){
+    snakeB->effect=Snake::NOEFFECT;
+    disconnect(&gametimer,&QTimer::timeout,this,&Gamecontroller::countdown);
+    rewardmonitor->display(0);
+    disconnect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
+    connect(timer+1,&QTimer::timeout,this,&Gamecontroller::SnakeBAdvance);
+    timer[1].start(DEFAULT_PERIOD);
+    rewardtime=REWARD_INTERVAL/1000;
+
+}
+
+bool Gamecontroller::eventFilter(QObject *object, QEvent *event){
     if (event->type() == QEvent::KeyPress) {
-        HandlekeyPress((QKeyEvent *)event);
+        handlekeyPress((QKeyEvent *)event);
         return true;
     } else {
         return QObject::eventFilter(object, event);
