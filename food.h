@@ -3,7 +3,7 @@
 #include <QGraphicsItem>
 #include "constant.h"
 
-static const QColor color[]={Qt::green,Qt::gray,Qt::red,Qt::darkYellow,Qt::blue};
+const QColor color[]={Qt::green,Qt::gray,Qt::red,Qt::yellow,Qt::blue,Qt::magenta,Qt::cyan};
 
 class Food:public QGraphicsItem
 {
@@ -12,6 +12,8 @@ class Food:public QGraphicsItem
                      GETMORESCORE,
                      ACCELERATE,
                      SLOWDOWN,
+                     BACKWARD,
+                     RANDOMMOVE
         } Function;
         friend class Gamecontroller;
 public:

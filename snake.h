@@ -4,13 +4,9 @@
 #include <QGraphicsItem>
 #include <QRectF>
 #include "constant.h"
-
-
+#include <qiterator.h>
 class Gamecontroller;
 class QLCDNumber;
-//const int DEFAULT_LENGTH=3;
-//const  int SNAKE_SIZE=10;
-//const QColor DEFAULT_COLOR=Qt::red;
 
 class Snake:public QGraphicsItem
 {
@@ -28,11 +24,12 @@ public:
     void setMoveDirection(Direction direction);
     void reshape();
     void ResetColor(){ColorOfSnake=DEFAULT_COLOR;effect=NOEFFECT;}
-
+    void moveBackward();
+    void randommove(QPoint newPos);
+    void autoforage();
     Gamecontroller &ctrl;
     QList<QPoint> body;
     Direction moveDirection;
-    int speed;
     int growing;
     int LengthOfSnake;
     int &score;

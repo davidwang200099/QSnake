@@ -16,11 +16,10 @@ MainWindow::~MainWindow()
     
 }
 
-void MainWindow::initFunction(){
+void MainWindow::initFunction(){//init the button for the special functions
     QPushButton *buttonA=new QPushButton("nightmode",this);
     buttonA->setGeometry(0,450,150,40);
     connect(buttonA,&QPushButton::clicked,this,&MainWindow::switchNightMode);
-    //ctrl->vp.push_back(buttonA);
 
     QCheckBox *buttonB=new QCheckBox("immortalmode",this);
     buttonB->setGeometry(200,450,150,40);
@@ -29,7 +28,10 @@ void MainWindow::initFunction(){
     QPushButton *buttonC=new QPushButton("restart",this);
     buttonC->setGeometry(400,450,150,40);
     connect(buttonC,&QPushButton::clicked,this->ctrl,&Gamecontroller::newGame);
-    //ctrl->vp.push_back(buttonC);
+
+    QPushButton *buttonD=new QPushButton("play BGM",this);
+    buttonD->setGeometry(0,500,150,40);
+    connect(buttonD,&QPushButton::clicked,this->ctrl,&Gamecontroller::playBGM);
 }
 
 void MainWindow::askUser(){

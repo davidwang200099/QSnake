@@ -6,7 +6,7 @@ enum Type{GD_Type};
 typedef enum{SINGLE,DOUBLE,AUTO} Mode;
 
 //food.h
-#define FUNCTION_TYPE 5
+#define FUNCTION_TYPE 7
 #define FOOD_SIZE 10
 #define FOOD_RADIUS 4
 //food.h
@@ -16,6 +16,8 @@ typedef enum{SINGLE,DOUBLE,AUTO} Mode;
 #define REWARD_INTERVAL 10000
 
 #define DEFAULT_PERIOD 100
+
+#define DEFAULT_RECORDNUM 10
 //gamecontroller.h
 //wall.h
 #define DEFAULT_WALL_WIDTH 50

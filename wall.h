@@ -12,7 +12,6 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,QWidget *widget);
-    //QPainterPath shape() const;
     void setx(int x){px=x;}
     void sety(int y){py=y;}
     void setxy(int x,int y){px=x;py=y;}
