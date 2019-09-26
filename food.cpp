@@ -4,7 +4,7 @@
 
 Food::Food(ObjectType t)
 {
-        FunctionOfFood=(t==REWARD)?Function(FUNCTION_TYPE):NOFUNCTION;
+        FunctionOfFood=(t==REWARD)?Function(rand()%FUNCTION_TYPE):NOFUNCTION;
         ColorOfFood=color[FunctionOfFood];
         setData(GD_Type,t);
         setPos(px=(rand()%60-30)*10,py=(rand()%40-20)*10);
