@@ -326,7 +326,7 @@ void Gamecontroller::playBGM(){
     if(!player){
     player=new QMediaPlayer;
     list.clear();
-    list.addMedia(QUrl::fromLocalFile("./bgm1.mp3"));
+    list.addMedia(QUrl::fromLocalFile("bgm1.mp3"));
     list.setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
     player->setPlaylist(&list);
     player->play();
