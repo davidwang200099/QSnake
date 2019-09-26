@@ -27,7 +27,7 @@ public:
     void initFunction();
     void switchNightMode(){
         if(scene->backgroundBrush()==QBrush(Qt::black))
-            scene->setBackgroundBrush(QPixmap("D:/cppfiles/QTProjects/snake2/d.jpg"));
+            scene->setBackgroundBrush(QPixmap("d.jpg"));
         else scene->setBackgroundBrush(QBrush(Qt::black));
     }
 	void newGame();
