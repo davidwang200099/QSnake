@@ -1,5 +1,5 @@
 QT+=widgets
-
+QT+=multimedia
 SOURCES += \
     food.cpp \
     gamecontroller.cpp \

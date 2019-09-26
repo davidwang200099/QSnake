@@ -99,51 +99,143 @@ void Snake::advance(int phase){
         if(!body.isEmpty()) body.removeFirst();
         body << PosOfSnake;
     }
-
+    if(ctrl.mode!=AUTO)
         switch (moveDirection) {
         case MoveLeft:
-            PosOfSnake.rx() -= SNAKE_SIZE;
-            if(PosOfSnake.rx()<X_MIN) PosOfSnake.rx()=X_MAX;
-            if(ctrl.mode==AUTO)
-              if(ctrl.food->px==PosOfSnake.x())
-                setMoveDirection(ctrl.food->px<PosOfSnake.y()?Snake::MoveUp:Snake::MoveDown);
-
+            PosOfSnake.rx() -= SNAKE_SIZE;//move one step
+            if(PosOfSnake.rx()<X_MIN) PosOfSnake.rx()=X_MAX;//deal with overflow
             break;
         case MoveRight:
             PosOfSnake.rx() += SNAKE_SIZE;
             if(PosOfSnake.rx()>X_MAX) PosOfSnake.rx()=X_MIN;
-           if(ctrl.mode==AUTO)
-              if(ctrl.food->px==PosOfSnake.x())
-                setMoveDirection(ctrl.food->px<PosOfSnake.y()?Snake::MoveUp:Snake::MoveDown);
             break;
         case MoveUp:
             PosOfSnake.ry() -= SNAKE_SIZE;
             if(PosOfSnake.ry()<Y_MIN) PosOfSnake.ry()=Y_MAX;
-            if(ctrl.mode==AUTO)
-              if(ctrl.food->py==PosOfSnake.y())
-                setMoveDirection(ctrl.food->px<PosOfSnake.x()?Snake::MoveLeft:Snake::MoveRight);
             break;
         case MoveDown:
             PosOfSnake.ry() += SNAKE_SIZE;
             if(PosOfSnake.ry()>Y_MAX) PosOfSnake.ry()=Y_MIN;
-            if(ctrl.mode==AUTO)
-              if(ctrl.food->py==PosOfSnake.y())
-                setMoveDirection(ctrl.food->px<PosOfSnake.x()?Snake::MoveLeft:Snake::MoveRight);
             break;
+        }
+    else{
+        switch (moveDirection) {
+        case MoveLeft:
+           if(body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE*2,PosOfSnake.y())))
+                if(!(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                    PosOfSnake.ry()-=SNAKE_SIZE;
+                else PosOfSnake.ry()+=SNAKE_SIZE;
+            else PosOfSnake.rx() -= SNAKE_SIZE;//if eating itself,change a direction
+
+            if(PosOfSnake.rx()<X_MIN) PosOfSnake.rx()=X_MAX;
+
+            if(ctrl.food->px==PosOfSnake.x())//head for food and avoid eating itself
+              if(ctrl.food->py<PosOfSnake.y())
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveDown);
+                else setMoveDirection(Snake::MoveUp);
+             else
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()+SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveUp);
+                else setMoveDirection(Snake::MoveDown);
+            break;
+        case MoveRight:
+            if(body.contains(QPoint(PosOfSnake.x()+SNAKE_SIZE*2,PosOfSnake.y())))
+                if(!(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                        setMoveDirection(Snake::MoveUp);
+                else PosOfSnake.rx() -= SNAKE_SIZE;
+            else PosOfSnake.rx() += SNAKE_SIZE;
+
+            if(PosOfSnake.rx()>X_MAX) PosOfSnake.rx()=X_MIN;
+
+            if(ctrl.food->px==PosOfSnake.x())
+              if(ctrl.food->py<PosOfSnake.y())
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveDown);
+                else setMoveDirection(Snake::MoveUp);
+             else
+                if((body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()+SNAKE_SIZE))))
+                  setMoveDirection(Snake::MoveUp);
+                else setMoveDirection(Snake::MoveDown);
+            break;
+        case MoveUp:
+            if(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()-SNAKE_SIZE*2)))
+                if(!(body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                        PosOfSnake.rx()-=SNAKE_SIZE;
+                else PosOfSnake.rx()+=SNAKE_SIZE;
+            else PosOfSnake.ry() -= SNAKE_SIZE;
+
+            if(PosOfSnake.ry()<Y_MIN) PosOfSnake.ry()=Y_MAX;
+
+            if(ctrl.food->py==PosOfSnake.y())
+              if(ctrl.food->px<PosOfSnake.x())
+                if((body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveRight);
+                else setMoveDirection(Snake::MoveLeft);
+             else
+                if((body.contains(QPoint(PosOfSnake.x()+SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveLeft);
+                else setMoveDirection(Snake::MoveRight);
+            break;
+        case MoveDown:
+            if(body.contains(QPoint(PosOfSnake.x(),PosOfSnake.y()+SNAKE_SIZE*2)))
+                if(!(body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                        PosOfSnake.rx()-=SNAKE_SIZE;
+                else PosOfSnake.rx()+=SNAKE_SIZE;
+            else
+                PosOfSnake.ry() += SNAKE_SIZE;
+
+            if(PosOfSnake.ry()>Y_MAX) PosOfSnake.ry()=Y_MIN;
+
+            if(ctrl.food->py==PosOfSnake.y())
+              if(ctrl.food->px<PosOfSnake.x())
+                if((body.contains(QPoint(PosOfSnake.x()-SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveRight);
+                else setMoveDirection(Snake::MoveLeft);
+             else
+                if((body.contains(QPoint(PosOfSnake.x()+SNAKE_SIZE,PosOfSnake.y()))))
+                  setMoveDirection(Snake::MoveLeft);
+                else setMoveDirection(Snake::MoveRight);
+
+            break;
+        }
+
     }
     setPos(PosOfSnake);
     handleCollision();
 }
 
-
 void Snake::handleCollision(){
     QList<QGraphicsItem*> l=collidingItems();
-    foreach(QGraphicsItem *item,l){
+    foreach(QGraphicsItem *item,l){//examine every colliding item
         if(item->data(GD_Type)==FOOD||item->data(GD_Type)==REWARD)
-          ctrl.SnakeAteFood(this,(Food *)item);
-        else if(ColorOfSnake!=Qt::gray&&item->data(GD_Type)==WALL)
+          ctrl.SnakeAteFood(this,(Food *)item);//eat food
+        else if(ColorOfSnake!=Qt::gray&&item->data(GD_Type)==WALL)//collide with the wall
             ctrl.gameover(this);
         }
     if(moveDirection!=NoMove&&body.contains(PosOfSnake)&&ColorOfSnake!=Qt::gray)
-        ctrl.gameover(this);
+        ctrl.gameover(this);//eat itself
+}
+
+void Snake::moveBackward(){
+    body.push_back(PosOfSnake);
+    QPoint p=body.first();
+    body.pop_front();
+    setPos(PosOfSnake=p);
+
+    int _size=body.size();
+    QPoint *pptr=new QPoint[_size];
+    for(int i=0;i<_size;i++) {pptr[i]=body.last();body.pop_back();}
+    for(int i=0;i<_size;i++){body.push_back(pptr[i]);}
+    switch(moveDirection){
+        case MoveUp:moveDirection=MoveDown;break;
+        case MoveDown:moveDirection=MoveUp;break;
+        case MoveLeft:moveDirection=MoveRight;break;
+        case MoveRight:moveDirection=MoveLeft;break;
+    }
+    delete [] pptr;
+}
+
+void Snake::randommove(QPoint newPos){
+    setPos(PosOfSnake=newPos);
 }
